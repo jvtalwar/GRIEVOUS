@@ -2,6 +2,6 @@
 
 ## Generalized Realignment of Innocuous and Essential Variants Otherwise Utilized as Skewed
 
-![TheGeneral](./imgs/GRIEVOUS.png)
+<img src="https://github.com/jvtalwar/GRIEVOUS/blob/master/imgs/GRIEVOUS.png" width = 350>
 
 *Hello There!* 
