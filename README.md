@@ -1,1 +1,4 @@
-# GRIEVOUS:
+# GRIEVOUS
+
+![TheGeneral](./imgs/GRIEVOUS.png)
+
