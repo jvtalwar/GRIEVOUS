@@ -254,15 +254,18 @@ class Pvar:
     
     Input(s): 1) writePath: String corresponding to the directory where want to write these files.
               2) returnFullFile: Boolean corresponding to whether to return the full aligned pvar file (including
-              any uncorrected information such as INFO columns) or the grievous column subset: [CHR, POS, ID, REF, ALT].
+              any uncorrected information such as INFO columns) or the grievous PVAR column subset: [CHR, POS, ID, REF, ALT].
     
-    Output(s): 1) None
+    Output(s): None
+
     Write(s): 
         1) The chromosome-level aligned pvar 
-        2) The chromosome-level ref-allele file  (can be passed to PLINK2 after duplicate removal)
-        3) The chromosome-level original pvar ID to formatted pvar index (can be passed to PLINK2 after duplicate removal)
-        4) The chromosome-level identified biallelic SNPs
-        5) The chromosome-level subset of identified biallelic SNPs that were reoriented from cohort orientation to grievous dictionary standard (if these exist).
+        2) The chromosome-level ref-allele files  (can be passed to PLINK2 after duplicate removal)
+        3) The chromosome-level original pvar ID to formatted pvar index files (can be passed to PLINK2 after duplicate removal)
+        4) A chromosome-level original ID SNP duplication report (if any duplicate IDs exist in the original file)
+        5) The chromosome-level identified biallelic SNPs
+        6) The chromosome-level subset of identified biallelic SNPs that were reoriented from cohort orientation to grievous dictionary standard (if these exist).
+        
     '''
     def Write(self, writePath, returnFullFile):
         getChromosomeID = self.file.CHR[0] 
@@ -315,7 +318,7 @@ class Pvar:
 
         logger.info("Duplicate removal for ReorientIndex and ReorientRefAlleleThisWay complete...\n")
 
-        logger.info("Writing biallelic SNPs and subset of biallelic SNPs that were reoriented from cohort specific orientation to grievous dictionary standard\n")
+        logger.info("Writing biallelic SNPs and subset of biallelic SNPs that were reoriented from cohort specific orientation to grievous database standard\n")
         
         pd.DataFrame(self.biallelicSNPs, columns = ["BiallelicSNPs"]).to_csv(os.path.join(writePath, "Reports/CHR{}_BiallelicSNPs.tsv".format(getChromosomeID)), sep = "\t", index = False)
         if len(self.flippedSNPs) > 0:

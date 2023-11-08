@@ -207,7 +207,7 @@ def GeneralGrievous():
               "Army or not, you must realize you are doomed!",
               "Only a SNP deals in absolutes. I will do what I must.",
               "SNP lords are our speciality.",
-              "No giving up general jar jar. Weesa think of something. My give up. My give up.",
+              "No giving up general jar jar. Weesa think of something.\nMy give up. My give up.",
               "Activate ray shields!",
               "Don't bother with them. Keep the SNPs in orbit!"]
     
@@ -232,6 +232,7 @@ def GeneralGrievous():
                       "@@@@@@@==#@%@@@@#=:++#+*-*@@@@#@%+-@@@@@@@","@@@@@@-=*%@@*@@@%=:=****-*@@@@%@@*-:@@@@@@",
                       "@@@@+*-=*@@@#@@%@+:*####-#@@@%@@@%-:*@@@@@"]
 
+    logger.info("\n")
     for line in grievousBanner:
         logger.info(line)
 

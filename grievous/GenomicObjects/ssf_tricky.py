@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class SSF(Pvar):
     '''
     Parameters:
-       filePath: String corresponding to where the file can be found (e.g., pvar)
+       filePath: String corresponding to where the file can be found (e.g., ssf)
        mappingPath: String corresponding to where column conversion standard can be found (default = None)
        commentCharsToSkip: List of strings corresponding to contiguous leading comments as are found across genomic files (default = ["##"]). 
                            
@@ -23,15 +23,20 @@ class SSF(Pvar):
         assert "BETA" in self.file.columns, "SSF Beta value missing (expecting BETA)"
 
     '''
-    About: This function generates a CHR-level formatted, oriented and aligned SSF file needed for tasks such as SNP-set identification and extraction by p-value in genotype cohorts or 
-    PRS construction. Note this CHR-level SSF file employs the aligned GRIEVOUS standard IDs as the index and returns the original IDs as ID.
+    About: Writes all reports as well as generates a CHR-level formatted, oriented, and aligned SSF file needed for tasks such as SNP-set identification 
+           and extraction by p-value in genotype cohorts or PRS construction. Note this CHR-level SSF employs the aligned GRIEVOUS standard IDs as the
+           index and returns the original IDs as ID.
     
-    Input(s): 1) writePath: String corresponding to the directory where want to write file(s).
-              2) returnFullFile: Boolean corresponding to whether to return the full aligned ssf file (including
-              any uncorrected information such as INFO columns) or the grievous column subset: [CHR, POS, ID, REF, ALT, BETA].
-    Output(s): Returns None 
+    Input(s):  1) writePath: String corresponding to the directory where want to write file(s).
+               2) returnFullFile: Boolean corresponding to whether to return the full aligned ssf file (including
+                  any uncorrected information such as INFO columns) or the grievous SSF column subset: [CHR, POS, ID, REF, ALT, BETA].
     
-    Write(s): 1) CHR oriented meta SSF (as a .tsv) 
+    Output(s): None 
+    
+    Write(s): 1) Chromosome-level grievous formatted and aligned SSF (as a .tsv) 
+              2) A chromosome-level original ID SNP duplication report (if any duplicate IDs exist in the original file)
+              3) The chromosome-level identified biallelic SNPs
+              4) The chromosome-level subset of identified biallelic SNPs that were reoriented from cohort orientation to grievous dictionary standard (if these exist).
     ''' 
     def Write(self, writePath, returnFullFile):
         getChromosomeID = list(self.file.CHR)[0]
@@ -67,19 +72,12 @@ class SSF(Pvar):
                     for originalID, grievousIndexes in v.items():
                         duplicationReport.write("\t".join([originalID , str(grievousIndexes)]) + "\n")
 
-        #Step 1 - check if there are any ID duplications - if so then proceed below...
-        #Sub-call PVAR of reorient index and change to numerical indexing; import _utils for cleanreorient index and then code for duplication report...
-
-        logger.info("Writing biallelic SNPs and subset of biallelic SNPs that were reoriented from cohort specific orientation to grievous dictionary standard\n")
+        logger.info("Writing biallelic SNPs and subset of biallelic SNPs that were reoriented from cohort specific orientation to grievous database standard\n")
         
         pd.DataFrame(self.biallelicSNPs, columns = ["BiallelicSNPs"]).to_csv(os.path.join(writePath, "Reports/CHR{}_BiallelicSNPs.tsv".format(getChromosomeID)), sep = "\t", index = False)
         if len(self.flippedSNPs) > 0:
             pd.DataFrame(self.flippedSNPs, columns = ["FlippedSNPs"]).to_csv(os.path.join(writePath, "Reports/CHR{}_FlippedSNPs.tsv".format(getChromosomeID)), sep = "\t", index = False)
 
-        
-        
         logger.info("GRIEVOUS Alignment for CHR {} complete\n".format(getChromosomeID))
-
-
         
         return None

@@ -11,9 +11,9 @@ from .utils import _QueryGrievousInstall
 logger = logging.getLogger(__name__)
 
 '''
-About: Helper method to create a new dictionary directory.
+About: Helper method to create a new grievous database/dictionary directory.
 
-Input(s): newDictPath: String corresponding to the directory where empty dictionary records will be created to be updated.
+Input(s): newDictPath: String corresponding to the directory where empty database/dictionary records will be created to be updated.
 Output(s): None
 '''
 def _Create_Dictionary(newDictPath, dictStorage = "parquet"):
