@@ -11,13 +11,13 @@ logger = logging.getLogger(__name__)
 '''
 About: This method takes in a path to a grievous realigned write directory and generates composite reports across
 all chromosomes that were completed at the time merge was called. If the write directory passed in was for an ssf
-file, merge will also generate a composite ssf as well.
+file, merge will also generate a composite ssf in the GRIEVOUS_Formatted subfolder.
 
-Input(s): 1) realignment_directory: String corresponding to the --write_path (-w) of a completed grievous realign.
-          2) updatedIDs: Boolean corresponding to whether to update/replace the original SSF IDs with the greivous realigned indexes.
+Input(s):  1) realignment_directory: String corresponding to the --write_path (-w) of a completed grievous realign.
+           2) updatedIDs: Boolean corresponding to whether to update/replace the original SSF IDs with the greivous realigned indexes.
 Output(s): None
-Write(s): Composite Biallelic and Flipped SNP reports for a given cohort and a composite ssf if the realignmentDirectory was
-          for an ssf file.
+Write(s):  Composite Biallelic and Flipped SNP reports for a given cohort and a composite ssf if the realignmentDirectory was
+           for an ssf file.
 '''
 def Merge(realignment_directory, updateIDs):
     #check if is a valid realignment directory
@@ -31,7 +31,7 @@ def Merge(realignment_directory, updateIDs):
     grievousFormattedDir = os.path.join(realignment_directory, "GRIEVOUS_Formatted")
     fileType = set([el.split("_")[0].split("FormattedAndAligned")[1] for el in os.listdir(grievousFormattedDir) if el.endswith(".tsv")])
 
-    assert (len(fileType) == 1) and ({"Pvar", "SSF"}.intersection(fileType) == fileType), f"{len(fileType)} file types found in --aligned_files directory {realignment_directory}. Given directory has realignment extensions: {fileType}. Ensure that every grievous realign has a unique write_path."
+    assert (len(fileType) == 1) and ({"Pvar", "SSF"}.intersection(fileType) == fileType), f"{len(fileType)} file types found in --aligned_files directory {realignment_directory}. Given directory has realignment extensions: {fileType}. Ensure that every dataset-level grievous realign has a unique write_path."
     
     extension = next(iter(fileType))
 
@@ -40,7 +40,7 @@ def Merge(realignment_directory, updateIDs):
     reportDirFiles = os.listdir(reportDir)
 
     if ("ALL_BiallelicSNPs.tsv" in reportDirFiles) or ("ALL_FlippedSNPs.tsv" in reportDirFiles):
-        logger.warning(f"WARNING: Detected previous merge files ALL_BiallelicSNPs/ALL_FlippedSNPs.tsv in --aligned_files {os.path.join(realignment_directory, 'Reports')}. Overwriting...")
+        logger.warning(f"WARNING: Detected previous merge files ALL_BiallelicSNPs/ALL_FlippedSNPs.tsv in --aligned_files {os.path.join(realignment_directory, 'Reports')}. Overwriting...\n")
     
     mergeReportFiles = [os.path.join(reportDir, file) for file in reportDirFiles if (file.endswith(".tsv")) and (not re.match("WARNING_CHR.*_BiallelicDuplicates.tsv", file)) and (file not in {"ALL_FlippedSNPs.tsv", "ALL_BiallelicSNPs.tsv"})]
 
@@ -71,7 +71,7 @@ def Merge(realignment_directory, updateIDs):
 
     #if SSF merge chromosomal-level SSFs into one cohesive SSF
     if extension == "SSF":
-        logger.info("Merging FormattedAndAlignedSSF files")
+        logger.info("\nMerging FormattedAndAlignedSSF files")
         mergeSSFFiles = [os.path.join(grievousFormattedDir, file) for file in os.listdir(grievousFormattedDir) if file.endswith(".tsv")]
 
         mergedSSF = pd.DataFrame()
@@ -85,6 +85,9 @@ def Merge(realignment_directory, updateIDs):
         
         else:
             mergedSSF.to_csv(os.path.join(grievousFormattedDir, "MergedSSF.ssf"), sep = "\t")
+
+        
+    logger.info("\ngrievous merge complete!")
 
 
     return None
