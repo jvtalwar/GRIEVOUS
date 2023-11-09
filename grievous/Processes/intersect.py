@@ -12,17 +12,17 @@ logger = logging.getLogger(__name__)
 About: This method takes in n number of grievous realigned and merged cohorts and generates the feature/SNP set 
 common to all cohorts of interest.
 
-Input(s): 1) write_path: String corresponding to the directory to which write the grievous intersect feature set.
-          2) cohorts: List of strings corresponding to the directories of grievous realigned and merged feature sets. 
-          For each cohort this corresponds to the --write_path provided to grievous realign and to the --aligned_files 
-          provided to grievous merge.
-          3) exclude_biallelic_duplicates: Boolean corresponding to whether to exclude or include biallelic SNPs that were 
-          originally duplicated in a cohort.
-          4) omit_palindromic: Boolean corresponding to whether to omit palindromic SNPs from the intersected feature set
-          5) file_output_name: String corresponding to the output file name written by grievous intersect.    
+Input(s):  1) write_path: String corresponding to the directory to which write the grievous intersect feature set.
+           2) cohorts: List of strings corresponding to the directories of grievous realigned and merged feature sets. 
+           For each cohort this corresponds to the --write_path provided to grievous realign and to the --aligned_files 
+           provided to grievous merge.
+           3) exclude_biallelic_duplicates: Boolean corresponding to whether to exclude or include biallelic SNPs that were 
+           originally duplicated in a cohort.
+           4) omit_palindromic: Boolean corresponding to whether to omit palindromic SNPs from the intersected feature set.
+           5) file_output_name: String corresponding to the output file name written by grievous intersect.    
 Output(s): None
-Write(s): An intersected SNP/feature set common to all cohorts provided in directory write_path with file name
-          file_output_name.
+Write(s):  An intersected SNP/feature set common to all cohorts provided in directory write_path with file name
+           file_output_name.
 '''
 
 def Intersect(write_path, cohorts, exclude_biallelic_duplicates, omit_palindromic, file_output_name):
@@ -42,6 +42,7 @@ def Intersect(write_path, cohorts, exclude_biallelic_duplicates, omit_palindromi
         run. If so, then no biallelic SNPs exist for cohort {cohort} and the intersection across all cohorts of interest is an empty set."""
 
     intersectingSNPs = set()
+    firstInstance = True
 
     for cohort in cohorts:
         reportDir = os.path.join(cohort, "Reports")
@@ -53,11 +54,11 @@ def Intersect(write_path, cohorts, exclude_biallelic_duplicates, omit_palindromi
             for dups in cohortBiallelicDuplicateFiles:
                  duplicatesToOmit = duplicatesToOmit.union(set(pd.read_csv(dups, sep = "\t", header = None)[0]))
 
-            #logger.info(f"\nDuplicated SNPs omitted from cohort {cohort}: \n{duplicatesToOmit}\n")
-
             cohortAlignedBiallelicSNPs = cohortAlignedBiallelicSNPs.difference(duplicatesToOmit)
 
-        if len(intersectingSNPs) == 0: #baseline - cohort 1
+        if firstInstance: # base case (i.e., first cohort in cohorts)
+            firstInstance = False
+            
             #Handle corner case where all SNPs are duplicated and exclude_biallelic_duplicates called - write an empty intersection (no SNPs to intersect)
             if len(cohortAlignedBiallelicSNPs) == 0:
                 break
@@ -74,7 +75,7 @@ def Intersect(write_path, cohorts, exclude_biallelic_duplicates, omit_palindromi
         palindromicSNPs = _IdentifyPalindromic(intersectingSNPs)
         intersectingSNPs = intersectingSNPs.difference(palindromicSNPs)
         
-        #logger.info(f"\nIdentified and removed {len(palindromicSNPs)} palindromic SNPs. They are: \n{palindromicSNPs}\n")
+        logger.info(f"\nIdentified and removed {len(palindromicSNPs)} palindromic SNPs.\n")
 
     logger.info(f"The number of intersecting SNPs across the given {len(cohorts)} cohorts is: {len(intersectingSNPs)}. Writing intersecting SNPs...")
 
