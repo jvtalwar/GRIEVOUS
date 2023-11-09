@@ -58,20 +58,20 @@ def _IdentifyPalindromic(candidateSNPs):
 
 '''
 About: This method generates a record report for a given database. Specifically
-it returns all cohorts/files that have been grievous realign to a given database/dictionary
-and employed for dictionary/database updates. This method will return records to logger 
+it returns all cohorts/files that have been grievous realigned to a given database/dictionary
+and employed for dictionary/database updates. This method returns records to logger 
 (i.e., user stream) in the absence of out (i.e., out is None).
 
-Input(s): 1) dbAlias: String corresponding to the dictionary/database for which the user is attempting to access records.
-          2) chromosomes: List corresponding to a subset of particular chromosomes for which to access records (as opposed to all).
+Input(s): 1) dbAlias: String corresponding to the grievous dictionary/database for which the user is attempting to access records.
+          2) chromosomes: List of strings corresponding to a subset of particular chromosomes for which to access records (as opposed to all).
           3) out: String corresponding to a path (including file name and extension) to which to write files.
 
 Output(s): None
-Write(s): recordReport - A report of all aligned and updated files aligned to a given database. If chromosomes is provided 
-          then report is limited to those chromosomes of interest. Otherwise returns records for all chromosomes.
+Write(s):  recordReport - A report of all aligned and updated files aligned to a given database. If chromosomes is provided 
+           then report is limited to those chromosomes of interest. Otherwise returns records for all chromosomes.
 '''
 def Records(dbAlias, chromosomes, out):
-    if out:#Validate out path if user provided one:
+    if out: #Validate out path if user provided one:
         if os.path.dirname(out) != '': 
             assert os.path.isdir(os.path.dirname(out)), f"--out parent directory {os.path.abspath(os.path.dirname(out))} does not exist. Provide valid path to --out."
 
@@ -115,7 +115,7 @@ def Records(dbAlias, chromosomes, out):
             recordReport.write(f"Reporting Records For Database:  {dbAlias} \n\n")
 
     else:
-        logging.info(f"Reporting Records For Database:  {dbAlias} \n\n")
+        logging.info(f"Reporting Records For Database:  {dbAlias} \n")
 
     for chromosome in chromosomalIteration:
         with open(os.path.join(grievousRecordsDir, f"CHR_{chromosome}.aligned.record.txt"), "r") as alignedRecord:
@@ -138,16 +138,14 @@ def Records(dbAlias, chromosomes, out):
                 recordReport.write("\n")
 
         else:
-            logger.info(f"CHR {chromosome} Records:\n\nALIGNED\n\n")
+            logger.info(f"CHR {chromosome} Records:\n\nALIGNED\n")
             for line in alignedContent:
                 logger.info(line)
 
-            logger.info("\nUPDATED DATABASE:\n\n") 
+            logger.info("UPDATED DATABASE:\n") 
 
             for line in updatedContent:
                 logger.info(line)
-
-            logger.info("\n")
             
 
     return None
@@ -156,7 +154,7 @@ def Records(dbAlias, chromosomes, out):
 About: This method takes in a database alias and if it exists deletes the database from the 
 grievous library.
 
-Input(s): dbAlias: String corresponding to the dictionary/database the user is attempting to delete.
+Input(s): dbAlias: String corresponding to the grievous dictionary/database the user is attempting to delete.
 Output(s): None
 '''
 def DeleteDatabase(dbAlias):
@@ -201,7 +199,7 @@ def GeneralGrievous():
               "Your variants will make a fine addition to my collection!",
               "I will deal with this variant slime myself...",
               "I don't like SNPs. They're coarse and rough and irritating and they get everywhere.",
-              "Wait a minute. How did this happen? We're smarter than this. Apparently not.",
+              "Wait a minute. How did this happen? We're smarter than this.\nApparently not.",
               "General Grievous, you're shorter than I expected.",
               "Hello there!",
               "Army or not, you must realize you are doomed!",
