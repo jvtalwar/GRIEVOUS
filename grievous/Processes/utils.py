@@ -34,9 +34,11 @@ def ListDicts():
     #get database/dictionary aliases
     grievousLibrary = [el for el in os.listdir(grievousDir) if os.path.isdir(os.path.join(grievousDir, el))]
 
-    logger.info("Current grievous database aliases:\n" + "-"*37)
+    logger.info("\nCurrent grievous database aliases:\n" + "-"*37)
     for dictionary in grievousLibrary:
         logger.info(dictionary)
+
+    logger.info("")
 
     return None 
 

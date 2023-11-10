@@ -47,7 +47,7 @@ class SSF(Pvar):
         else:
             self.file[["CHR", "POS", "ID", "REF", "ALT", "BETA"]].to_csv(os.path.join(writePath, "GRIEVOUS_Formatted/FormattedAndAlignedSSF_CHR{}.tsv".format(getChromosomeID)), sep = "\t")
     
-        logger.info("\nFinished writing aligned and formatted chromosome {} ssf\n".format(getChromosomeID))
+        logger.info("Finished writing aligned and formatted chromosome {} ssf\n".format(getChromosomeID))
 
         #Identify and report ID duplicates in the SSF if they exist
         if sum(self.file.duplicated(subset = ["ID"], keep = False)) > 0:
