@@ -72,7 +72,7 @@ class Pvar:
 
     '''
     def Clean(self):
-        logger.info("Total number of SNPs in this Chromosome {}: {}".format(self.fileType, self.file.shape[0]))
+        logger.info("Total number of SNPs in this Chromosome {}: {}\n".format(self.fileType, self.file.shape[0]))
 
         self.file["EasyCHRLOC"] = [el for el in (self.file["CHR"] + ":" + self.file["POS"].astype(str))] # helper column for ease of downstream Clean method processing
         
@@ -89,10 +89,10 @@ class Pvar:
         #Check for potential AA, CC, TT, GG, alleles and remove
         ensureThingsAreValid = validFile.loc[biallelicCandidateIndices, :]
         sanityChecker = ensureThingsAreValid[ensureThingsAreValid.REF == ensureThingsAreValid.ALT].shape[0] == 0
-        logger.info("Sanity Check: Are all identified biallelic candidate SNPs valid (i.e., not AA, CC, GG, TT)? {}".format(sanityChecker))
+        logger.info("Sanity Check: Are all identified biallelic candidate SNPs valid (i.e., not AA, CC, GG, TT)? {}\n".format(sanityChecker))
         
         if not sanityChecker:
-            logger.info("{} AA, CC, GG, TT SNPs detected. Removing now...".format(ensureThingsAreValid[ensureThingsAreValid.REF == ensureThingsAreValid.ALT].shape[0]))
+            logger.info("{} AA, CC, GG, TT SNPs detected. Removing now...\n".format(ensureThingsAreValid[ensureThingsAreValid.REF == ensureThingsAreValid.ALT].shape[0]))
             ensureThingsAreValid = ensureThingsAreValid[ensureThingsAreValid.REF != ensureThingsAreValid.ALT]
     
         self._candidateBiallelicSNPIDs = list(ensureThingsAreValid.index)
@@ -138,7 +138,7 @@ class Pvar:
         logger.info("{}/{} SNPs were not found in grievous chromosome database. These SNPs are proceeding to db/dictionary addition validation.\n".format(len(indexOfSnpsThatNeedToBeSanityCheckedBeforeAddingToMegaDictionary), biallelicCandidateSubset.shape[0]))
 
         dictionaryAddendum, snpIndexesThatDisagreeWithDictionary = SanityCheckSNPsNotInDictionary(biallelicCandidateSubset.loc[indexOfSnpsThatNeedToBeSanityCheckedBeforeAddingToMegaDictionary, :], chromosomeDictionary) 
-        logger.info("There were {} genomic biallelic SNPs that deviated from grievous chromosome database. Removing these...".format(len(snpIndexesThatDisagreeWithDictionary)))
+        logger.info("There were {} genomic biallelic SNPs that deviated from grievous chromosome database. Removing these...\n".format(len(snpIndexesThatDisagreeWithDictionary)))
 
         #Get the list of valid SNP indexes/remove invalid SNPs (those that were in mega dict, but differed by allele)
         self._biallelicSNPIndexes = [i for i in biallelicCandidateSubset.index if i not in snpIndexesThatDisagreeWithDictionary]
@@ -165,7 +165,7 @@ class Pvar:
         assert self._biallelicSNPIndexes is not None, ".Orient() must be called before .Align()"
 
         #Swap alleles that are backwards and orient the Beta coefficient correctly if differs from db/dictionary
-        chromosomeNumber = self.file.CHR[0] #str(self.file.loc[0, "CHR"])
+        chromosomeNumber = self.file.CHR[0] 
 
         for swapLoc in self._theseIndexesNeedToFlipTheirRefAndAltAlleles:
             newRef = self.file.loc[swapLoc, "ALT"]
@@ -185,11 +185,11 @@ class Pvar:
         #Sanity check: This can happen when SNPs are completely duplicated in the original pvar by CHR POS REF ALT; Log/Report warning SNPs to user
         if self.file[self.file.index.duplicated(keep = False)].shape[0] != 0: 
             whoseCausingProblems = self.file[self.file.index.duplicated(keep = False)]
-            logger.warning("\nWARNING: {} SNP duplication events exist in the original file.".format(whoseCausingProblems.shape[0])) 
+            logger.warning("WARNING: {} SNP duplication events exist in the original file.".format(whoseCausingProblems.shape[0])) 
             biallelicProblems = set(whoseCausingProblems.index).intersection(set(formattedBiallelicIndexes))
-            logger.warning("Of the SNPs duplicated by GRIEVOUS formatted index, {} of them is/are biallelic SNPs.".format(len(biallelicProblems)))
+            logger.warning("Of the SNPs duplicated by GRIEVOUS formatted index, {} of them is/are biallelic SNPs.\n".format(len(biallelicProblems)))
             if len(biallelicProblems) > 0:
-                logger.warning("These biallelic SNPs are {}. Writing to WARNING_CHR{}_BiallelicDuplicates file now.".format(biallelicProblems, chromosomeNumber))
+                logger.warning("These biallelic SNPs are {}. Writing to WARNING_CHR{}_BiallelicDuplicates file now.\n".format(biallelicProblems, chromosomeNumber))
                 pd.DataFrame(biallelicProblems).to_csv(os.path.join(writePath, "Reports/WARNING_CHR{}_BiallelicDuplicates.tsv".format(chromosomeNumber)), sep = "\t", index = False, header = None)
             #logger.warning("All duplicated index elements are:\n{}".format(whoseCausingProblems.index))
             
@@ -225,7 +225,7 @@ class Pvar:
         updatedDictPath = os.path.join(dictPath, updateName)
 
         #update the dictionary and write:
-        logger.info("\nAdding {} total SNPs to GRIEVOUS database".format(len(self.dictionaryAddendum)))
+        logger.info("Adding {} total SNPs to GRIEVOUS database".format(len(self.dictionaryAddendum)))
         updatedDict = pd.concat([chromosomeDictionary, pd.DataFrame(self.dictionaryAddendum).T], axis = 0)
 
         if fileExtension == "parquet":
@@ -241,7 +241,7 @@ class Pvar:
             raise Exception(f"ERROR: All biallelic SNPs not found in previous CHR {self.Chrom} alignment dictionary were not written successfully. Exiting...")
         
         else:
-            logger.info("Dictionary update validated! Replacing previous alignment dictionary with the updated version.")
+            logger.info("Dictionary update validated! Replacing previous alignment dictionary with the updated version.\n")
             os.remove(os.path.join(dictPath, f"CHR_{self.Chrom}.{fileExtension}"))
             os.rename(updatedDictPath, os.path.join(dictPath, f"CHR_{self.Chrom}.{fileExtension}"))
 

@@ -57,7 +57,7 @@ def ExtractValidSNPs(formattedFile):
             keepForDownstreamProcessing.add(node)
         
     toReturn = formattedFile[formattedFile.EasyCHRLOC.isin(keepForDownstreamProcessing)] #valid SNPs
-    logger.info("\n{}/{} valid SNPs (with IDs not pointing to multiple locations) were extracted in preprocessing.\n".format(toReturn.shape[0], formattedFile.shape[0]))
+    logger.info("{}/{} valid SNPs (with IDs not pointing to multiple locations) were extracted in preprocessing.\n".format(toReturn.shape[0], formattedFile.shape[0]))
         
     return toReturn
 
