@@ -125,12 +125,9 @@ Input(s): A cleaned biallelic dataframe of a genomic file
 Output(s): A dictionary mapping CHR:POS:REF:ALT to a given genomic file index
 '''
 def GenerateForwardIndices(genomicFile):
-    mapping = defaultdict(str)
     goInThisOrder = ["CHR", "POS", "REF", "ALT"]
-
-    for i in genomicFile.index:
-        key = ":".join([str(genomicFile.loc[i, col]) for col in goInThisOrder])
-        mapping[key] = i
+    grievousStandard = genomicFile[goInThisOrder].apply(lambda x: ":".join(map(str, x)), axis = 1)
+    mapping = dict(zip(grievousStandard.values, grievousStandard.index))
 
     return mapping
 

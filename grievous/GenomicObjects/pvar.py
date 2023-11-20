@@ -167,13 +167,12 @@ class Pvar:
         #Swap alleles that are backwards and orient the Beta coefficient correctly if differs from db/dictionary
         chromosomeNumber = self.file.CHR[0] 
 
-        for swapLoc in self._theseIndexesNeedToFlipTheirRefAndAltAlleles:
-            newRef = self.file.loc[swapLoc, "ALT"]
-            self.file.loc[swapLoc, "ALT"] = self.file.loc[swapLoc, "REF"]
-            self.file.loc[swapLoc, "REF"] = newRef
-            if self.fileType == ".ssf": #SSF files (from which this class inherits) need to also reorient their Betas when in the opposite orientation
-                self.file.loc[swapLoc, "BETA"] = self.file.loc[swapLoc, "BETA"] * -1 
-            
+        swapCondition = self.file.index.isin(self._theseIndexesNeedToFlipTheirRefAndAltAlleles)
+        self.file.loc[swapCondition, ["REF", "ALT"]] = self.file.loc[swapCondition, ["ALT", "REF"]].values
+
+        if self.fileType == ".ssf": #SSF files (from which this class inherits) need to also reorient their Betas when in the opposite orientation
+            self.file.loc[swapCondition, "BETA"] *= -1
+
         #Index the dataframe according to CHR:POS:REF:ALT now that it has been db/dictionary oriented
         goInThisOrder = ["CHR", "POS", "REF", "ALT"]
         self.file.index = [":".join([str(self.file.loc[i,col]) for col in goInThisOrder]) for i in self.file.index]
