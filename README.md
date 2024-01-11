@@ -2,7 +2,10 @@
 
 ## Generalized Realignment of Innocuous and Essential Variants Otherwise Utilized as Skewed
 
-<p align="center"><img src="imgs/GRIEVOUS.png" width = 350></p>
+<p align="left">
+<img src="imgs/GRIEVOUS_Logos/GRIEVOUS Red Blade Logo.png" width = 350>
+<img src="imgs/GRIEVOUS_Logos/GRIEVOUS Double Blades.png" width = 350>
+</p>
 
 *Hello There!* Welcome to GRIEVOUS, your command-line general to order the variant galaxy. In these hallowed archives, you will find all-manners of information for releasing GRIEVOUS on the intractable, inimical, insidious problem of variant harmonization in genomic datasets. Sound like a load of waffle? Okay, I'll attempt to eloquently expound...
 
