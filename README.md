@@ -2,7 +2,7 @@
 
 ## Generalized Realignment of Innocuous and Essential Variants Otherwise Utilized as Skewed
 
-<p align="left">
+<p align="center">
 <img src="imgs/GRIEVOUS_Logos/GRIEVOUS Red Blade Logo.png" width = 350>
 <img src="imgs/GRIEVOUS_Logos/GRIEVOUS Double Blades.png" width = 350>
 </p>
