@@ -21,7 +21,7 @@ def main():
 
     GRIEVOUS is a command-line tool for ensuring cross-cohort variant consistency. Specifically, 
     for any given cohort, GRIEVOUS will identify, orient, and realign all valid biallelic variants 
-    from a chromosomal-level plink2 summary file (i.e., .pvar) or summary statistic file to 
+    from a chromosomal-level plink2 variant information file (i.e., .pvar) or summary statistic file to 
     a user-specific variant database. Upon database alignment completion for all datasets of interest, 
     GRIEVOUS returns a comprehensive, consistently oriented and indexed feature set (across all 
     datasets), which can be used for the user's task of choice (e.g., ML training, validation, and
