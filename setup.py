@@ -5,7 +5,7 @@ with open("longDescription.md", "r") as longDescFile:
 
 setup(
     name = "grievous",
-    version = "0.1.2",
+    version = "0.1.3",
     author = "James V. Talwar",
     author_email = "jtalwar@ucsd.edu",
     description = "Generalized Realignment of Innocuous and Essential Variants Otherwise Utilized as Skewed",
