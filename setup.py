@@ -1,11 +1,15 @@
 from setuptools import setup, find_packages
 
+with open("longDescription.md", "r") as longDescFile:
+    longDescription = longDescFile.read()
+
 setup(
     name = "grievous",
-    version = "0.1.0",
+    version = "0.1.1",
     author = "James V. Talwar",
     author_email = "jtalwar@ucsd.edu",
     description = "Generalized Realignment of Innocuous and Essential Variants Otherwise Utilized as Skewed",
+    long_description = longDescription,
     license = "LICENSE",
     url = "https://github.com/jvtalwar/GRIEVOUS", 
     packages = find_packages(),
