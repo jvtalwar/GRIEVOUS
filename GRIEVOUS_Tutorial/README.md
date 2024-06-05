@@ -15,7 +15,10 @@ For validation of a complete tutorial `grievous` run, we provide two files:
 The run this validation script in accordance with the paths provided by the tutorial:
 
 ```bash
-#PATH_TO_GRIEVOUS_TUTORIAL_INTERSECTING_SNPs=~/GRIEVOUS_Tutorial/Tutorial_Intersecting_SNPs.tsv #<-- Update this to the specific path of Tutorial_Intersecting_SNPs.tsv on your machine.
-#PATH_TO_GRIEVOUS_INTERSECT_OUTPUT=~/GRIEVOUS_Tutorial/IntersectingVariants/AllIntersectingSNPs.tsv #<-- Update this with the specific path of your grievous tutorial intersect output. 
 python validate_tutorial.py -i PATH_TO_GRIEVOUS_TUTORIAL_INTERSECTING_SNPs -g PATH_TO_GRIEVOUS_INTERSECT_OUTPUT
 ```
+
+ - For example - according to the tutorial we would update the above PATHs as the following:
+    - `PATH_TO_GRIEVOUS_TUTORIAL_INTERSECTING_SNPs=~/GRIEVOUS_Tutorial/Tutorial_Intersecting_SNPs.tsv` <-- Update this to the specific path of Tutorial_Intersecting_SNPs.tsv on your machine.
+    - `PATH_TO_GRIEVOUS_INTERSECT_OUTPUT=~/GRIEVOUS_Tutorial/IntersectingVariants/AllIntersectingSNPs.tsv` <-- Update this with the specific path of your grievous tutorial intersect output. 
+ - These paths should be updated (as needed) according to any changes or modifications you made to your tutorial run through (in terms of paths and/or the output name of `grievous intersect`)
