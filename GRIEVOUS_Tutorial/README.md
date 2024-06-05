@@ -1,4 +1,4 @@
-# GRIEVOUS Tutorial: Datasets and Validation!
+# GRIEVOUS Tutorial: Datasets and Validation
 
 Welcome intrepid investigator to the GRIEVOUS tutorial's datasets and validation directory. Here you will find the test datasets specified in the [tutorial](https://github.com/jvtalwar/GRIEVOUS/wiki/Data,-Preprocessing,-And-Formatting), in the `Datasets/Sarcoidosis/` subdirectory. You can download these datasets by cloning the GRIEVOUS github repository with `git clone https://github.com/jvtalwar/GRIEVOUS`. 
 
