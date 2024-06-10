@@ -1,6 +1,7 @@
 # @author: James V. Talwar
 
 import pandas as pd
+import polars as pl
 import logging
 from collections import defaultdict
 import os
@@ -32,12 +33,20 @@ Input(s): Formatted pandas dataframe of a genomic object file (i.e., pvar or SSF
 Output(s): A processed dataframe of the genomic file filtered out for invalid SNPs that have multiple (RS)ID mappings
 '''
 def ExtractValidSNPs(formattedFile): 
+    #convert formattedFile to polars dataframe for efficiency; track original indices
+    formattedFile["Original_Index"] = formattedFile.index
+    formattedFile = pl.DataFrame(formattedFile)
+
+    #extract relevant columns for graph creation:
+    chromLocs = formattedFile["EasyCHRLOC"].to_list()
+    datasetIDs = formattedFile["ID"].to_list()
+
     chrLocToID = defaultdict(set)
     idToChrLoc = defaultdict(set)
     
-    for i in formattedFile.index: 
-        chrLocToID[formattedFile.loc[i, "EasyCHRLOC"]].add(formattedFile.loc[i, "ID"]) 
-        idToChrLoc[formattedFile.loc[i, "ID"]].add(formattedFile.loc[i, "EasyCHRLOC"]) 
+    for chromLoc, datasetID in zip(chromLocs, datasetIDs):
+        chrLocToID[chromLoc].add(datasetID)
+        idToChrLoc[datasetID].add(chromLoc)
         
     graph = defaultdict(lambda: defaultdict(set)) 
     
@@ -56,7 +65,14 @@ def ExtractValidSNPs(formattedFile):
         if validSNP:
             keepForDownstreamProcessing.add(node)
         
-    toReturn = formattedFile[formattedFile.EasyCHRLOC.isin(keepForDownstreamProcessing)] #valid SNPs
+    toReturn = formattedFile.filter(pl.col("EasyCHRLOC").is_in(list(keepForDownstreamProcessing))) #valid SNPs
+
+    #convert back to pandas dataframe for downstream compatability:
+    toReturn = toReturn.to_pandas()
+    toReturn.index = toReturn.Original_Index
+    toReturn.index.name = None
+    toReturn = toReturn.drop(["Original_Index"], axis = 1)
+
     logger.info("{}/{} valid SNPs (with IDs not pointing to multiple locations) were extracted in preprocessing.\n".format(toReturn.shape[0], formattedFile.shape[0]))
         
     return toReturn
@@ -164,7 +180,10 @@ Output(s): 1) addendum: A dictionary of CHR:POS:REF:ALT --> {CHR:STR, POS:###, R
 def SanityCheckSNPsNotInDictionary(snpsNotInDict, chromosomeDictionary):
     goInThisOrder = ["CHR", "POS", "REF", "ALT"]
        
-    uhOhSpudodios = snpsNotInDict[(snpsNotInDict.POS.isin(chromosomeDictionary.POS))] #Identified biallelic SNPs that are in the db/dictionary but with different SNPs at REF and ALT; chromosome-level so only need to filter by pos since all CHR match
+    #copy chromosomeDictionary as a polars dataframe for run-time efficiency
+    chromDict = pl.DataFrame(chromosomeDictionary) 
+
+    uhOhSpudodios = snpsNotInDict[(snpsNotInDict.POS.isin(chromDict["POS"]))] #Identified biallelic SNPs that are in the db/dictionary but with different SNPs at REF and ALT; chromosome-level so only need to filter by pos since all CHR match
     invalidSNPs = set(uhOhSpudodios.index) 
     validSNPsToAddToDict = snpsNotInDict[~snpsNotInDict.index.isin(uhOhSpudodios.index)]
     
@@ -172,14 +191,17 @@ def SanityCheckSNPsNotInDictionary(snpsNotInDict, chromosomeDictionary):
     addendum = validSNPsToAddToDict[goInThisOrder + ["ID"]].T.to_dict() #subset down to only the 5 dictionary reqs  
     del validSNPsToAddToDict
     
-    dictionaryCollisions = chromosomeDictionary[(chromosomeDictionary.POS.isin(uhOhSpudodios.POS))] 
+    dictionaryCollisions = chromDict.filter(pl.col("POS").is_in(uhOhSpudodios.POS.tolist())) 
     
     #Report in logs to user all SNPs that are identified as biallelic, but diverge from grievous database and thus are excluded
     for i in uhOhSpudodios.index:
-        amIHere = dictionaryCollisions[dictionaryCollisions.POS == uhOhSpudodios.loc[i, "POS"]] 
-        logger.info("SNP index {} (ID: {}) disagrees between pvar/ssf and database and will be removed. GRIEVOUS Database: {}; pvar/ssf: {}".format(i, uhOhSpudodios.loc[i, "ID"], list(amIHere.loc[:, "REF"] + amIHere.loc[:, "ALT"])[0], uhOhSpudodios.loc[i, "REF"] + uhOhSpudodios.loc[i, "ALT"]))
+        amIHere = dictionaryCollisions.filter(pl.col("POS") == uhOhSpudodios.loc[i, "POS"]) 
+        databaseRef = amIHere.select("REF").to_series()[0]
+        databaseAlt = amIHere.select("ALT").to_series()[0]
+        logger.info("SNP index {} (ID: {}) disagrees between pvar/ssf and database and will be removed. GRIEVOUS Database: {}; pvar/ssf: {}".format(i, uhOhSpudodios.loc[i, "ID"], databaseRef + databaseAlt, uhOhSpudodios.loc[i, "REF"] + uhOhSpudodios.loc[i, "ALT"]))
             
     del dictionaryCollisions
+    del chromDict
     
     return addendum, invalidSNPs
 

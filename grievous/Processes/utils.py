@@ -36,7 +36,11 @@ def ListDicts():
 
     logger.info("\nCurrent grievous database aliases:\n" + "-"*37)
     for dictionary in grievousLibrary:
-        logger.info(dictionary)
+        grievousAssemblyPath = os.path.join(grievousDir, dictionary, "Assembly.txt")
+        with open(grievousAssemblyPath, "r") as dbAssembly:
+            databaseAssembly = dbAssembly.readlines()
+
+        logger.info(dictionary + f" --> Assembly: {databaseAssembly[0]}")
 
     logger.info("")
 

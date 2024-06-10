@@ -82,7 +82,7 @@ class Pvar:
 
         #Preprocess - remove all SNPs with IDs pointing to multiple locations
         idCleanedFile = ExtractValidSNPs(validFile)
-
+        
         #Perform QC on idCleanedFile to get a set of biallelic SNP candidates (which will be compared against the grievous db/dictionary in Orient)
         biallelicCandidateIndices = ExtractBiallelicCandidates(idCleanedFile)
         
@@ -163,7 +163,7 @@ class Pvar:
 '''
     def Align(self, writePath):
         assert self._biallelicSNPIndexes is not None, ".Orient() must be called before .Align()"
-
+        
         #Swap alleles that are backwards and orient the Beta coefficient correctly if differs from db/dictionary
         chromosomeNumber = self.file.CHR[0] 
 
@@ -175,21 +175,24 @@ class Pvar:
 
         #Index the dataframe according to CHR:POS:REF:ALT now that it has been db/dictionary oriented
         goInThisOrder = ["CHR", "POS", "REF", "ALT"]
-        self.file.index = [":".join([str(self.file.loc[i,col]) for col in goInThisOrder]) for i in self.file.index]
+        grievousUnifiedIndex =  self.file[goInThisOrder].astype(str).agg(':'.join, axis = 1)
+        self.file.index = grievousUnifiedIndex 
         
         #Now that indexed, oriented, and aligned get the biallelic CHR:POS:REF:ALT indexes
-        formattedBiallelicIndexes = list(map(list(self.file.index).__getitem__, self._biallelicSNPIndexes))
-        flippedSNPs = list(map(list(self.file.index).__getitem__, self._theseIndexesNeedToFlipTheirRefAndAltAlleles))
+        formattedBiallelicIndexes = self.file.index[self._biallelicSNPIndexes].tolist() 
+        flippedSNPs = self.file.index[self._theseIndexesNeedToFlipTheirRefAndAltAlleles].tolist() 
 
         #Sanity check: This can happen when SNPs are completely duplicated in the original pvar by CHR POS REF ALT; Log/Report warning SNPs to user
-        if self.file[self.file.index.duplicated(keep = False)].shape[0] != 0: 
-            whoseCausingProblems = self.file[self.file.index.duplicated(keep = False)]
+        completelyDuplicatedVariants = self.file.index[self.file.index.duplicated(keep = False)]
+        if not completelyDuplicatedVariants.empty:
+            whoseCausingProblems = self.file.loc[completelyDuplicatedVariants]
             logger.warning("WARNING: {} SNP duplication events exist in the original file.".format(whoseCausingProblems.shape[0])) 
             biallelicProblems = set(whoseCausingProblems.index).intersection(set(formattedBiallelicIndexes))
             logger.warning("Of the SNPs duplicated by GRIEVOUS formatted index, {} of them is/are biallelic SNPs.\n".format(len(biallelicProblems)))
             if len(biallelicProblems) > 0:
                 logger.warning("These biallelic SNPs are {}. Writing to WARNING_CHR{}_BiallelicDuplicates file now.\n".format(biallelicProblems, chromosomeNumber))
                 pd.DataFrame(biallelicProblems).to_csv(os.path.join(writePath, "Reports/WARNING_CHR{}_BiallelicDuplicates.tsv".format(chromosomeNumber)), sep = "\t", index = False, header = None)
+            
             #logger.warning("All duplicated index elements are:\n{}".format(whoseCausingProblems.index))
             
 

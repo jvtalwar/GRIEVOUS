@@ -14,16 +14,21 @@ logger = logging.getLogger(__name__)
 About: Helper method to create a new grievous database/dictionary directory.
 
 Input(s):  1) newDictPath: String corresponding to the directory where empty database/dictionary records will be created to be updated.
-           2) dictStorage: String corresponding to database storage method. Default: 'parquet'
+           2) assembly: String corresponding to genome assembly for given dataset (stripped of leading and trailing whitespace).
+           3) dictStorage: String corresponding to database storage method. Default: 'parquet'
 Output(s): None
 '''
-def _Create_Dictionary(newDictPath, dictStorage = "parquet"):
+def _Create_Dictionary(newDictPath, assembly, dictStorage = "parquet"):
     if os.path.isdir(newDictPath): #chromosome-level paralleleization - if database is in process of (or has finished) being created don't need to re-create/overwrite db
         return None
 
     #Create new dictionary folder
     os.makedirs(newDictPath, exist_ok = True)
     os.makedirs(os.path.join(newDictPath, "Records"), exist_ok = True)
+
+    #Create an assembly file:
+    with open(os.path.join(newDictPath, "Assembly.txt"), "w") as assemblyFile:
+        assemblyFile.write(assembly)
 
     #Create empty record files and empty dictionary files 
     chromosomes = [str(i) for i in range(1,23)] + ["X", "Y", "MT"] #Grievous standard for chromosomes
@@ -51,10 +56,11 @@ def _Create_Dictionary(newDictPath, dictStorage = "parquet"):
     return None
 
 '''
-Input(s): dbAlias: String corresponding to an already created or novel dictionary/database alias. 
+Input(s): 1) dbAlias: String corresponding to an already created or novel dictionary/database alias. 
+          2) assembly: String corresponding to genome assembly for given dataset (stripped of leading and trailing whitespace).
 Outputs: grievousDictDir: String corresponding to the full path of the desired grievous dictionary/database directory.
 '''
-def _Check_Dictionary(dbAlias):
+def _Check_Dictionary(dbAlias, assembly):
     grievousDir = _QueryGrievousInstall()
 
     #check among the dictionary aliases
@@ -67,14 +73,24 @@ def _Check_Dictionary(dbAlias):
 
             grievousDictDir = os.path.join(grievousDir, grievousDictAliases[0])
 
+            with open(os.path.join(grievousDir, grievousDictAliases[0], "Assembly.txt"), "r") as dbAssembly:
+                databaseAssembly = dbAssembly.readlines()
+
+            assert databaseAssembly[0] == assembly, f"User specified assembly of {assembly} for given dataset does not align with existing grievous database ({grievousDictAliases[0]}) assembly of {databaseAssembly[0]}. Ensure dataset assembly matches database genome assembly. Exiting..."
+
         else:
-            logger.warning(f"CREATING A NEW GRIEVOUS DICTIONARY WITH ALIAS: {dbAlias}")
+            logger.warning(f"CREATING A NEW GRIEVOUS DICTIONARY WITH ALIAS: {dbAlias}; ASSEMBLY: {assembly}")
             
             grievousDictDir = os.path.join(grievousDir, dbAlias)
-            _Create_Dictionary(grievousDictDir)
+            _Create_Dictionary(newDictPath = grievousDictDir, assembly = assembly)
 
     else:         
         grievousDictDir = os.path.join(grievousDir, dbAlias)
+        
+        with open(os.path.join(grievousDir, dbAlias, "Assembly.txt"), "r") as dbAssembly:
+            databaseAssembly = dbAssembly.readlines()
+
+        assert databaseAssembly[0] == assembly, f"User specified assembly of {assembly} for given dataset does not align with specified existing grievous database ({dbAlias}) assembly of {databaseAssembly[0]}. Ensure dataset assembly matches database genome assembly. Exiting..."
 
     # Ensure all chromosomal dictionaries/dbs are written; instances of creation and file non-existence can occur when initializing a DB and running in parallel. 
     # To prevent a given chromosome from attempting to access a db before creation (while in progress) sleep to allow for all chromosome creation.
@@ -98,11 +114,13 @@ Input(s): 1) file: String corresponding to the path of the file which the user i
           7) comment_characters: List of all comment characters corresponding to lines to skip at the beginning of a genomic file.
           8) shutoff_dict_update: Boolean corresponding to whether to skip the dictionary update step. If there is ever any ambiguity 
           as to whether to use this or not (or whether one will align future cohorts), then this parameter SHOULD ALWAYS BE FALSE!
+          9) assembly: String corresponding to the genome assembly of the given dataset. Must match specified grievous database's assembly
+          if existing database). New databases will otherwise be assigned to the defined assembly.
 
 Output(s): None
 Write(s): Grievous PVAR/SSF output files (for full details see Pvar.Write() or SSF.Write()).
 '''
-def Realign(file, dictionary, write_path, mapping, file_type, return_all, comment_characters, shutoff_dict_update):
+def Realign(file, dictionary, write_path, mapping, file_type, return_all, comment_characters, shutoff_dict_update, assembly):
     assert os.path.exists(file), f"File path {file} does not exist. Exiting..."
     
     if write_path is not None: #If user does not pass in write_path will attempt to create a write directory: GrievousAlignedFiles
@@ -128,7 +146,7 @@ def Realign(file, dictionary, write_path, mapping, file_type, return_all, commen
         gFile = SSF(filePath = file, mappingPath = mapping, commentCharsToSkip = comment_characters)
 
     #Identify/Make necessary grievous database/dictionary directory and load chromosome-level database/dictionary
-    grievousDictionaryPath = _Check_Dictionary(dictionary)
+    grievousDictionaryPath = _Check_Dictionary(dictionary, assembly.strip())
     dictionaryExtension = ""
 
     try:
