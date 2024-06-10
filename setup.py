@@ -15,7 +15,7 @@ setup(
     url = "https://github.com/jvtalwar/GRIEVOUS", 
     packages = find_packages(),
     python_requires = '>=3.7',
-    install_requires = ["pandas >= 1.3.4"],
+    install_requires = ["pandas >= 1.3.4", "polars >= 0.16.11"],
 
     scripts=["grievous/generalGrievous.py"],
 
