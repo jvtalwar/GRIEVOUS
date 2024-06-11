@@ -39,35 +39,44 @@ def Merge(realignment_directory, updateIDs):
     reportDir = os.path.join(realignment_directory, "Reports")
     reportDirFiles = os.listdir(reportDir)
 
-    if ("ALL_BiallelicSNPs.tsv" in reportDirFiles) or ("ALL_FlippedSNPs.tsv" in reportDirFiles):
-        logger.warning(f"WARNING: Detected previous merge files ALL_BiallelicSNPs/ALL_FlippedSNPs.tsv in --aligned_files {os.path.join(realignment_directory, 'Reports')}. Overwriting...\n")
+    if ("ALL_BiallelicSNPs.tsv" in reportDirFiles) or ("ALL_FlippedSNPs.tsv" in reportDirFiles) or ("ALL_MultiallelicSNPs.tsv" in reportDirFiles):
+        logger.warning(f"WARNING: Detected previous merge files ALL_BiallelicSNPs/ALL_FlippedSNPs.tsv/ALL_MultiallelicSNPs.tsv in --aligned_files {os.path.join(realignment_directory, 'Reports')}. Overwriting...\n")
     
-    mergeReportFiles = [os.path.join(reportDir, file) for file in reportDirFiles if (file.endswith(".tsv")) and (not re.match("WARNING_CHR.*_BiallelicDuplicates.tsv", file)) and (file not in {"ALL_FlippedSNPs.tsv", "ALL_BiallelicSNPs.tsv"})]
+    mergeReportFiles = [os.path.join(reportDir, file) for file in reportDirFiles if (file.endswith(".tsv")) and (not re.match("WARNING_CHR.*_BiallelicDuplicates.tsv", file)) and (file not in {"ALL_FlippedSNPs.tsv", "ALL_BiallelicSNPs.tsv", "ALL_MultiallelicSNPs.tsv"})]
 
     biallelicSNPs = list()
     flippedSNPs = list()
-
+    multiallelicSNPs = {"GRIEVOUS_ID": [], "Dataset_ID": []}
     for report in mergeReportFiles:
         prefix = report.split("/")[-1].split("_")[-1].split(".")[0]
-        assert prefix in {"BiallelicSNPs", "FlippedSNPs"}, f"Unknown report {report} with prefix {prefix} found. Valid prefixes for reports are 'BiallelicSNPs' and 'FlippedSNPs'. Exiting..."
+        assert prefix in {"BiallelicSNPs", "FlippedSNPs", "MultiallelicSNPs"}, f"Unknown report {report} with prefix {prefix} found. Valid prefixes for reports are 'BiallelicSNPs', 'FlippedSNPs', and 'MultiallelicSNPs'. Exiting..."
 
-        toAppend = pd.read_csv(report, sep = "\t")[prefix].tolist()
-
-        if prefix == "BiallelicSNPs":
-            biallelicSNPs = biallelicSNPs + toAppend
+        if prefix == "MultiallelicSNPs":
+            chromMultiallelicReport = pd.read_csv(report, sep = "\t")
+            multiallelicSNPs["GRIEVOUS_ID"] += chromMultiallelicReport["GRIEVOUS_ID"].tolist()
+            multiallelicSNPs["Dataset_ID"] += chromMultiallelicReport["Dataset_ID"].tolist()
 
         else:
-            flippedSNPs = flippedSNPs + toAppend
+            toAppend = pd.read_csv(report, sep = "\t")[prefix].tolist()
+
+            if prefix == "BiallelicSNPs":
+                biallelicSNPs = biallelicSNPs + toAppend
+
+            else:
+                flippedSNPs = flippedSNPs + toAppend
 
 
-    #Write AllBiallelic and AllFlipped files
+    #Write AllBiallelic, AllFlipped, and AllMultiallelic files
     if len(biallelicSNPs) > 0:
         pd.DataFrame(biallelicSNPs, columns = ["BiallelicSNPs"]).to_csv(os.path.join(reportDir, "ALL_BiallelicSNPs.tsv"), sep = "\t", index = False)
 
     if len(flippedSNPs) > 0:
         pd.DataFrame(flippedSNPs, columns = ["FlippedSNPs"]).to_csv(os.path.join(reportDir, "ALL_FlippedSNPs.tsv"), sep = "\t", index = False)
 
-    logger.info("Biallelic and flipped SNP reports merged.")
+    if len(multiallelicSNPs["GRIEVOUS_ID"]) > 0:
+        pd.DataFrame(multiallelicSNPs).to_csv(os.path.join(os.path.join(reportDir, "ALL_MultiallelicSNPs.tsv")), sep = "\t", index = False)
+
+    logger.info("Biallelic, flipped, and multiallelic SNP reports merged.")
 
     #if SSF merge chromosomal-level SSFs into one cohesive SSF
     if extension == "SSF":

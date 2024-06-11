@@ -34,7 +34,7 @@ Output(s): A processed dataframe of the genomic file filtered out for invalid SN
 '''
 def ExtractValidSNPs(formattedFile): 
     #convert formattedFile to polars dataframe for efficiency; track original indices
-    formattedFile["Original_Index"] = formattedFile.index
+    formattedFile.loc[:, "Original_Index"] = formattedFile.index
     formattedFile = pl.DataFrame(formattedFile)
 
     #extract relevant columns for graph creation:
@@ -124,17 +124,17 @@ def ExtractBiallelicCandidates(chromPosDouble):
     validSnpsAsWell = forFurtherFiltering[sneakyBiallelics] 
     logger.info("Filter IDENTIFIED AND EXTRACTED {} valid biallelic SNPs that were duplicated by CHR, POS due to duplication through REF/ALT switches.".format(validSnpsAsWell.shape[0]))
 
-    invalidSnps = forFurtherFiltering[~sneakyBiallelics]  
-    logger.info("Filter IDENTIFIED {} invalid SNPs that were duplicated by CHR, POS but had multiple alleles per position.".format(invalidSnps.shape[0]))
+    invalidSnps = forFurtherFiltering[~sneakyBiallelics] #multi-allelic and CC/TT/AA/GG SNPs 
+    invalidSnps = invalidSnps[invalidSnps.REF != invalidSnps.ALT] # remove the complete REF/ALT duplicates
+    logger.info("Filter IDENTIFIED {} multiallelic SNPs that were duplicated by CHR, POS and had multiple alleles per position. Adding these SNPs to MultiallelicSNPs report.".format(invalidSnps.shape[0]))
     
     #Now drop the duplicates from valid SNPs by those columns where duplication is relevant - namely CHR, POS, and sortedREFALT
     validSnpsAsWell = validSnpsAsWell.drop_duplicates(subset = ["CHR", "POS", "SortedREFALT"]) 
     
-    
     #Step 6 (Nearly There, Nearly There...): Concatenate all the valid SNPs and return a list of indexes:
     toReturn = pd.concat([noDups, validSnpsAsWell], axis = 0)
      
-    return list(toReturn.index)
+    return list(toReturn.index), list(invalidSnps.index)
 
 '''
 Input(s): A cleaned biallelic dataframe of a genomic file

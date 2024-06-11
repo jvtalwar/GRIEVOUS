@@ -77,6 +77,9 @@ class SSF(Pvar):
         pd.DataFrame(self.biallelicSNPs, columns = ["BiallelicSNPs"]).to_csv(os.path.join(writePath, "Reports/CHR{}_BiallelicSNPs.tsv".format(getChromosomeID)), sep = "\t", index = False)
         if len(self.flippedSNPs) > 0:
             pd.DataFrame(self.flippedSNPs, columns = ["FlippedSNPs"]).to_csv(os.path.join(writePath, "Reports/CHR{}_FlippedSNPs.tsv".format(getChromosomeID)), sep = "\t", index = False)
+        
+        if len(self.multiallelicSNPs["GRIEVOUS_ID"]) > 0:
+            pd.DataFrame(self.multiallelicSNPs).to_csv(os.path.join(writePath, "Reports/CHR{}_MultiallelicSNPs.tsv".format(getChromosomeID)), sep = "\t", index = False)
 
         logger.info("GRIEVOUS Alignment for CHR {} complete\n".format(getChromosomeID))
         

@@ -50,13 +50,15 @@ class Pvar:
         self._candidateBiallelicSNPIDs = None #Candidate biallelic index subset of the genomic file as updated by the Clean() method below
         self._theseIndexesNeedToFlipTheirRefAndAltAlleles = None #Indexes of SNPs that need to be reoriented - updated by Orient() below
         self._biallelicSNPIndexes = None #The GRIEVOUS identified biallelic index SNP indexes (post QC and dictionary divergence check)
-        
+        self._multiallelicSNPIndexes = None #GRIEVOUS identified multiallelic SNP indices
+
         #Key states:  
         self.dictionaryAddendum = dict() #updated in Orient()
 
         #update in Align()
         self.biallelicSNPs = list()
         self.flippedSNPs = list()
+        self.multiallelicSNPs = dict()
 
     @property
     def Chrom(self):
@@ -84,7 +86,7 @@ class Pvar:
         idCleanedFile = ExtractValidSNPs(validFile)
         
         #Perform QC on idCleanedFile to get a set of biallelic SNP candidates (which will be compared against the grievous db/dictionary in Orient)
-        biallelicCandidateIndices = ExtractBiallelicCandidates(idCleanedFile)
+        biallelicCandidateIndices, self._multiallelicSNPIndexes = ExtractBiallelicCandidates(idCleanedFile)
         
         #Check for potential AA, CC, TT, GG, alleles and remove
         ensureThingsAreValid = validFile.loc[biallelicCandidateIndices, :]
@@ -138,6 +140,7 @@ class Pvar:
         logger.info("{}/{} SNPs were not found in grievous chromosome database. These SNPs are proceeding to db/dictionary addition validation.\n".format(len(indexOfSnpsThatNeedToBeSanityCheckedBeforeAddingToMegaDictionary), biallelicCandidateSubset.shape[0]))
 
         dictionaryAddendum, snpIndexesThatDisagreeWithDictionary = SanityCheckSNPsNotInDictionary(biallelicCandidateSubset.loc[indexOfSnpsThatNeedToBeSanityCheckedBeforeAddingToMegaDictionary, :], chromosomeDictionary) 
+        self._multiallelicSNPIndexes += list(snpIndexesThatDisagreeWithDictionary) # These are multiallelic as they diverge from specified database's allowable alleles 
         logger.info("There were {} genomic biallelic SNPs that deviated from grievous chromosome database. Removing these...\n".format(len(snpIndexesThatDisagreeWithDictionary)))
 
         #Get the list of valid SNP indexes/remove invalid SNPs (those that were in mega dict, but differed by allele)
@@ -181,6 +184,7 @@ class Pvar:
         #Now that indexed, oriented, and aligned get the biallelic CHR:POS:REF:ALT indexes
         formattedBiallelicIndexes = self.file.index[self._biallelicSNPIndexes].tolist() 
         flippedSNPs = self.file.index[self._theseIndexesNeedToFlipTheirRefAndAltAlleles].tolist() 
+        multiAllelicSNPs = {"GRIEVOUS_ID": self.file.index[self._multiallelicSNPIndexes].tolist(), "Dataset_ID": self.file["ID"][self._multiallelicSNPIndexes].tolist()}
 
         #Sanity check: This can happen when SNPs are completely duplicated in the original pvar by CHR POS REF ALT; Log/Report warning SNPs to user
         completelyDuplicatedVariants = self.file.index[self.file.index.duplicated(keep = False)]
@@ -199,6 +203,7 @@ class Pvar:
         #Update object biallelic SNPs and flipped SNPs
         self.biallelicSNPs = formattedBiallelicIndexes
         self.flippedSNPs = flippedSNPs
+        self.multiallelicSNPs = multiAllelicSNPs
 
         return None 
         
@@ -325,6 +330,9 @@ class Pvar:
         pd.DataFrame(self.biallelicSNPs, columns = ["BiallelicSNPs"]).to_csv(os.path.join(writePath, "Reports/CHR{}_BiallelicSNPs.tsv".format(getChromosomeID)), sep = "\t", index = False)
         if len(self.flippedSNPs) > 0:
             pd.DataFrame(self.flippedSNPs, columns = ["FlippedSNPs"]).to_csv(os.path.join(writePath, "Reports/CHR{}_FlippedSNPs.tsv".format(getChromosomeID)), sep = "\t", index = False)
+
+        if len(self.multiallelicSNPs["GRIEVOUS_ID"]) > 0:
+            pd.DataFrame(self.multiallelicSNPs).to_csv(os.path.join(writePath, "Reports/CHR{}_MultiallelicSNPs.tsv".format(getChromosomeID)), sep = "\t", index = False)
 
         logger.info("GRIEVOUS Alignment for CHR {} complete\n".format(getChromosomeID))
 
