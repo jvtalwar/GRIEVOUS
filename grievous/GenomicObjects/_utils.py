@@ -33,9 +33,10 @@ Input(s): Formatted pandas dataframe of a genomic object file (i.e., pvar or SSF
 Output(s): A processed dataframe of the genomic file filtered out for invalid SNPs that have multiple (RS)ID mappings
 '''
 def ExtractValidSNPs(formattedFile): 
-    #convert formattedFile to polars dataframe for efficiency; track original indices
-    formattedFile.loc[:, "Original_Index"] = formattedFile.index
+    #convert formattedFile to polars dataframe for efficiency; track original indices which will get lost otherwise in polars conversion
+    originalIndex = formattedFile.index.tolist() 
     formattedFile = pl.DataFrame(formattedFile)
+    formattedFile = formattedFile.with_columns(pl.Series("Original_Index", originalIndex))
 
     #extract relevant columns for graph creation:
     chromLocs = formattedFile["EasyCHRLOC"].to_list()
