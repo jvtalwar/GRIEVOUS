@@ -39,7 +39,7 @@ def main():
     realignParser.add_argument("--database", "-d", type = str, default = None, help = """User defined alias for a grievous database/dictionary. If None (default) grievous
                             will check internal settings to see if a single registered database is established, and if so will employ that for realignment. If more than 
                             one database is registered, the user must specify a database alias. Database aliases can be accessed with 'grievous list_dbs'.""")
-    realignParser.add_argument("--assembly", "-a", type = str, default = None, help = """Genome assembly for dataset of interest. For existing databases, this must match the specified grievous 
+    realignParser.add_argument("--assembly", "-a", type = str, required = True, help = """Genome assembly for dataset of interest. For existing databases, this must match the specified grievous 
                                database genome assembly. For new databases, the specified assembly will be assigned to the user defined database.""")
     realignParser.add_argument("--file_type", "-t", type = str, help = "File type in {'pvar', 'ssf'} when automatic detection of file extension fails (i.e., when file does not end with .pvar or .ssf).")
     realignParser.add_argument("--write_path", "-w", type = str, default = None, help = """Directory to which grievous realigned files will be written. 
