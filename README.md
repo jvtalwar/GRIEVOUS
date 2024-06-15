@@ -2,19 +2,26 @@
 
 ## Generalized Realignment of Innocuous and Essential Variants Otherwise Utilized as Skewed
 
-<p align="center">
-<img src="imgs/GRIEVOUS_Logos/GRIEVOUS Red Blade Logo.png" width = 350>
-<img src="imgs/GRIEVOUS_Logos/GRIEVOUS Double Blades.png" width = 350>
-</p>
+*Hello There!* Welcome to GRIEVOUS, your command-line general to order the variant galaxy. Specifically, GRIEVOUS is your command-line tool for guaranteeing cross-dataset variant consistency in genomic datasets.
 
-*Hello There!* Welcome to GRIEVOUS, your command-line general to order the variant galaxy. In these hallowed archives, you will find all-manners of information for releasing GRIEVOUS on the intractable, inimical, insidious problem of variant harmonization in genomic datasets. Sound like a load of waffle? Okay, I'll attempt to eloquently expound...
+## Overview
 
-Whether conducting a genome-wide association study (GWAS) or formulating, validating, and/or deploying a polygenic risk score (PRS), cross-dataset variant consistency in indexing and orientation is integral to the fidelity of your results. Previously the unenviable onus of variant standardization and allele consistency across all datasets of interest, fell on you, an esteemed, reputable and rambunctious researcher. GRIEVOUS is your command-line tool for guaranteeing cross-dataset variant consistency, freeing you from the shackles of time-consuming (and error-prone) tedium. Specifically, GRIEVOUS homogenizes indices across variants and reorients all biallelic SNPs across all datasets of interest (regardless of the number) consistently, handling common-issues such as duplications or multiple-indexing. GRIEVOUS can also be used to extract the set of biallelic SNPs common across all datasets of interest. Curious as to what types of data upon which you can unleash GRIEVOUS? Outstanding, I love the inquisitiveness (you must be a stellar scientist)! The answer would be summary statistics and genotype files.
+The synchronization of variant indexing and orientation is critical for multi-genomic dataset integration. Previously, the burdens of generating unified variant indices, synchronizing allele orientations, and extracting the set of variants common across all datasets of interest, fell upon the researcher. GRIEVOUS was designed to abstract, automate, and ameliorate these tasks. Succinctly, GRIEVOUS homogenizes variant indices and synchronizes biallelic SNPs allele orientations across all datasets of interest (regardless of the number) consistently, while also handling common-issues such as duplications or multiple-indexing. GRIEVOUS can also be used to extract the set of biallelic SNPs common across all datasets of interest. 
 
-Still lost? *Sigh,* perhaps a more thorough elaboration is required. Okay then, for a comprehensive detailed dive into GRIEVOUS, jump on over to our [documentation and tutorial](https://github.com/jvtalwar/GRIEVOUS/wiki)!  
+<img src="imgs/GRIEVOUS_Github_Overview.png">
 
-Your time is valuable, and your research invaluable. Be sure to reclaim your time and guarantee the integrity of your results with GRIEVOUS. If you do, don't forget to cite our paper (link coming soon)! Until we meet again in another repository my fellow gentleperson of erudition, I wish you good fortune in the analyses to come (...*though in my experience, there's no such thing as luck*).
+## Key Features
 
-*[JVT](https://jvtalwar.github.io/dk-isle/)*  
+ - **Cross-dataset consistency**: Ensures that variant indices and biallelic allele orientations are consistent across all datasets.
+ - **Data compatibility**: Works with both summary statistics and genotype files.
+ - **Extraction**: Can extract the set of biallelic SNPs common across all genomic datasets of interest.
 
+
+## Getting Started
+
+For instructions on how to install and use GRIEVOUS, jump on over to our [documentation and tutorial](https://github.com/jvtalwar/GRIEVOUS/wiki).
+
+## Citation
+
+If you found GRIEVOUS helpful in your research, don't forget to cite our paper (link coming soon)!
 
