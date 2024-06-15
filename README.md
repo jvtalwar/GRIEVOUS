@@ -5,7 +5,7 @@
 *Hello There!* Welcome to GRIEVOUS, your command-line general to order the variant galaxy. Specifically, GRIEVOUS is your command-line tool for guaranteeing cross-dataset variant consistency in genomic datasets.
 
 <p align="center">
-<img src="imgs/GRIEVOUS_Logos/GRIEVOUS Red Blade Logo.png" width = 250>
+<img src="imgs/GRIEVOUS_Logos/GRIEVOUS Red Blade Logo.png" width = 300>
 </p>
 
 ## Overview
