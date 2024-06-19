@@ -4,7 +4,6 @@
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/jvtalwar/GRIEVOUS/master/imgs/GRIEVOUS_Logos/GRIEVOUS%20Red%20Blade%20Logo.png" width = 350>
-<img src="https://raw.githubusercontent.com/jvtalwar/GRIEVOUS/master/imgs/GRIEVOUS_Logos/GRIEVOUS%20Double%20Blades.png" width = 350>
 </p>
 
 *Hello There!* Welcome to GRIEVOUS, your command-line general to order the variant galaxy, or more specifically, for releasing GRIEVOUS on the intractable, inimical, insidious problem of variant harmonization in genomic datasets. Sound like a load of waffle? Okay, I'll attempt to eloquently expound...
