@@ -10,13 +10,13 @@
 
 ## Overview
 
-The synchronization of variant indexing and orientation is critical for multi-genomic dataset integration. Previously, the burdens of generating unified variant indices, synchronizing allele orientations, and extracting the set of variants common across all datasets of interest, fell upon the researcher. GRIEVOUS was designed to abstract, automate, and ameliorate these tasks. Succinctly, GRIEVOUS homogenizes variant indices and synchronizes biallelic SNP allele orientations across all datasets of interest (regardless of the number) consistently, while also handling common-issues such as duplications or multiple-indexing. GRIEVOUS can also be used to extract the set of biallelic SNPs common across all datasets of interest. 
+The synchronization of variant indexing and allele assignments is critical for multi-genomic dataset integration. Previously, the burdens of generating unified variant indices, synchronizing allele assignments, and extracting the set of variants common across all datasets of interest, fell upon the researcher. GRIEVOUS was designed to abstract, automate, and ameliorate these tasks. Succinctly, GRIEVOUS homogenizes variant indices and synchronizes biallelic SNP allele assignments across all datasets of interest (regardless of the number) consistently, while also handling common-issues such as duplications or multiple-indexing. GRIEVOUS can also be used to extract the set of biallelic SNPs common across all datasets of interest. 
 
 <img src="imgs/GRIEVOUS_Github_Overview.png">
 
 ## Key Features
 
- - **Cross-dataset consistency**: Ensures that variant indices and biallelic allele orientations are consistent across all datasets.
+ - **Cross-dataset consistency**: Ensures that variant indices and biallelic allele assignments are consistent across all datasets.
  - **Data compatibility**: Works with both summary statistics and genotype files.
  - **Extraction**: Can extract the set of biallelic SNPs common across all genomic datasets of interest.
 
