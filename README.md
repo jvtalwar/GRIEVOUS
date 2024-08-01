@@ -26,5 +26,5 @@ For instructions on how to install and use GRIEVOUS, jump on over to our [docume
 
 ## Citation
 
-If you found GRIEVOUS helpful in your research, don't forget to cite our paper (link coming soon)!
+If you found GRIEVOUS helpful in your research, don't forget to cite our [paper](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btae489/7723992)!
 
